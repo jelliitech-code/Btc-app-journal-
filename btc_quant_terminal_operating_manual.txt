@@ -1,0 +1,235 @@
+================================================================================
+QUANT GLASS · WALL STREET INSTITUTIONAL BTCUSDT PERPETUAL TERMINAL
+OPERATING PLAYBOOK, $100/DAY EXECUTION PROTOCOL & FINANCIAL MATHEMATICS MANUAL
+================================================================================
+
+1. SYSTEM OVERVIEW & APPLE LIQUID GLASS ARCHITECTURE
+--------------------------------------------------------------------------------
+The Quant Glass BTCUSDT Perpetual Terminal is a self-contained Wall Street
+quantitative execution and microstructure analysis workstation engineered with
+Apple Spatial Liquid Glass aesthetics (strictly two high-contrast monochrome
+polarities: Obsidian Dark Glass and Ceramic White Glass, with pill-capsule
+controls and frosted spatial cards).
+
+Live Open-Source Market Data Pipeline:
+- Primary Stream: Binance USD-M Futures REST API (https://www.google.com/search?q=fapi.binance.com/fapi/v1)
+  providing OHLCV klines, Taker Buy Volume (for exact aggressive order-flow
+  delta), L2 Order Book depth (1,000 levels), Aggregate Trade Tape (1,000 prints),
+  8-hour Funding Rate, and Open Interest across 6 timeframes (1m, 3m, 5m, 15m,
+  30m, 1h).
+- Secondary Failover: Bybit V5 Linear Perpetual API (https://www.google.com/search?q=api.bybit.com/v5/market).
+- Tertiary Deterministic Quant Stream: Calibrated Ornstein-Uhlenbeck + Jump-
+  Diffusion synthetic microstructure engine so the terminal remains 100%
+  operational even when offline or behind restrictive firewalls.
+
+
+2. STEP-BY-STEP DAILY OPERATING WORKFLOW ($100/DAY TARGET PROTOCOL)
+--------------------------------------------------------------------------------
+To systematically target $100.00/day in net realized profit using pure math and
+disciplined risk control, execute the following 6-step desk workflow every
+session:
+
+STEP 1 — Configure Capital & Risk Allocation (Left Floating Glass Sidebar)
+  - Set "Account Equity ($)" to your actual trading capital (e.g., $10,000).
+  - Set "Risk / Trade ($)" (1R unit) to 0.5% - 1.0% of equity (e.g., $50.00).
+  - Set "Daily Target ($)" to $100.00 (at $50 risk per trade, $100/day equals
+    exactly +2.0R net per day).
+
+STEP 2 — Open the "$100/Day Engine" Tab (Tab 2)
+  - Inspect the "Max-Heap Priority Queue · Multi-Timeframe Trade Sequencer".
+  - The engine evaluates all 6 timeframes (1m, 3m, 5m, 15m, 30m, 1h) and uses a
+    Binary Max-Heap Priority Queue to rank every active blueprint by its
+    Mathematical Expected Value (EV_R) and First-Passage Win Probability
+    P(tau_TP1 < tau_SL).
+  - Select the #1 ranked timeframe ("TOP PICK") where:
+      (a) First-Passage P(Hit TP1) >= 62%
+      (b) Expected Value (EV) >= +0.25R net of fees
+      (c) Composite Confluence Score >= +25 (for Longs) or <= -25 (for Shorts)
+
+STEP 3 — Verify Stochastic Regime on the "Market Analysis" Tab (Tab 3)
+  - Check the Hurst Exponent (H) on your chosen timeframe:
+      * If H > 0.55 (Persistent Trend Regime): Trade "Kalman-VWAP Pullback" or
+        "Momentum Break" setups in the direction of the EMA200 and Kalman
+        velocity.
+      * If H < 0.45 (Ornstein-Uhlenbeck Mean-Reversion Regime): Trade "Sweep &
+        Reclaim" or "OU Z-Score Reversion" setups when |Z_OU| > 1.85 sigma.
+  - Check the Ornstein-Uhlenbeck Half-Life (tau_1/2): This tells you the exact
+    expected number of bars (and minutes) for price to revert 50% of the way
+    back to equilibrium mu.
+
+STEP 4 — Audit Microstructure on "Volume & CVD" (Tab 5) & "Iceberg" (Tab 6)
+  - On the "Volume & CVD" tab (powered by a 48-bin Fenwick Tree):
+      * Locate the 240-bar Point of Control (VPOC), Value Area High (VAH), and
+        Value Area Low (VAL).
+      * Ensure no major High-Volume Node (HVN) blocks the path between your
+        Entry price and TP1.
+      * Confirm Cumulative Volume Delta (CVD) is rising for Longs (or falling
+        for Shorts). Bullish Absorption (lower price low + higher CVD low) is
+        the highest-conviction institutional buy signal.
+  - On the "Iceberg & Whales" tab (powered by a 1,000-trade RingBuffer & MaxHeap):
+      * Check for Hidden Buy Icebergs (at or just below your Long entry) where
+        executed volume exceeds 1.6x visible resting depth.
+      * Check VPIN (Volume-Synchronized Probability of Informed Trading) and
+        Kyle's Lambda (price impact per 1 BTC).
+
+STEP 5 — Confirm Point Forecast on "AI-Math Forecast" (Tab 7)
+  - Check the 1-Bar and 3-Bar Kalman + OU mathematical point forecasts and the
+    GARCH(1,1) 68% / 95% probability fan cones.
+  - Verify that the Walk-Forward Out-of-Sample Point Accuracy (100% - MAPE) is
+    above 99.0% on your execution timeframe and that the Bayesian Regime
+    Posterior favors your trade direction.
+
+STEP 6 — Execute Precision Coordinates on "Entry & Exit" (Tab 4)
+  - Place a MAKER LIMIT ORDER at the "Optimal Limit Entry" price (aligned with
+    the Kalman latent state and session VWAP equilibrium) to minimize fee drag.
+  - Immediately attach your Hard Stop-Loss (SL) at the specified SL coordinate.
+  - Set Automated Scale-Out Take-Profits:
+      * Close 50% of the position at TP1 (1.0R) and ratchet your Stop-Loss to
+         the Breakeven Trigger coordinate.
+      * Close 30% of the position at TP2 (2.0R).
+      * Trail the final 20% runner toward TP3 using the Chandelier Trail offset
+        (1.15 x ATR).
+  - Daily Circuit-Breaker Rule: Once your session reaches +$100.00 net (+2.0R),
+    lock in profits for the day. If you hit -2.0R (-$100.00) in a single day,
+    stop trading for 6 hours until regime alignment returns.
+
+
+3. DATA STRUCTURES & ALGORITHMS (DSA) SPECIFICATION
+--------------------------------------------------------------------------------
+The terminal implements four core computer science data structures directly in
+JavaScript for real-time quantitative processing:
+
+1. Fenwick Tree (Binary Indexed Tree — `FenwickTree` class)
+   - Time Complexity: O(log N) point update, O(log N) prefix sum & range sum.
+   - Space Complexity: O(N) typed Float64Array (N = 48 price bins).
+   - Application: Computes the 48-bin Volume Profile, Point of Control (POC),
+     and expands the 70% Value Area (VAH / VAL) via binary range queries
+     `bit.rangeQuery(leftBin, rightBin)` without O(N^2) array rescanning.
+
+2. Binary Max-Heap Priority Queue (`MaxHeap` class)
+   - Time Complexity: O(log K) insertion (`push`), O(log K) extraction (`pop`).
+   - Application:
+     (a) Ranks all 6 timeframe trade blueprints in real time by composite
+         mathematical Expected Value: Score = 100 * EV_R + 50 * P(tau_TP1 < tau_SL).
+     (b) Extracts the top 8 Iceberg Absorption price buckets ranked by
+         RefillScore = (V_executed / V_visible) * V_executed.
+     (c) Extracts the top 10 institutional Whale Prints (> 0.85 BTC single clips).
+
+3. Monotonic Double-Ended Queue (`MonotonicDeque` class)
+   - Time Complexity: O(1) amortized insertion and sliding-window min/max query.
+   - Application: Tracks rolling structural highs/lows and stop-sweep extremes.
+
+4. Circular Ring Buffer (`RingBuffer` class)
+   - Time Complexity: O(1) overwrite-oldest insertion with zero garbage-
+     collection allocation overhead.
+   - Application: Maintains the trailing 1,000 aggressive market trade prints
+     for real-time VPIN toxicity bucketing and whale tape inspection.
+
+
+4. COMPLETE WALL STREET FINANCIAL MATHEMATICS & CLOSED-FORM EQUATIONS
+--------------------------------------------------------------------------------
+
+A. 1D KINEMATIC STATE-SPACE KALMAN FILTER (PRICE & VELOCITY ESTIMATION)
+   State Vector at bar k:
+     x_k = [ p_k, v_k ]^T   (where p_k = latent price, v_k = price velocity)
+
+   State Transition Matrix (F) & Observation Matrix (H):
+     F = [ [1, 1], [0, 0.96] ],   H = [1, 0]
+
+   Prediction Step:
+     x_{k|k-1} = F * x_{k-1|k-1}
+     P_{k|k-1} = F * P_{k-1|k-1} * F^T + Q_k
+     where process noise Q_k = diag((0.08 * ATR_k)^2, (0.03 * ATR_k)^2)
+
+   Measurement Update Step (Adaptive Volatility Scaling):
+     Innovation Residual:   y_k = z_k - H * x_{k|k-1}   (z_k = observed Close)
+     Innovation Covariance: S_k = H * P_{k|k-1} * H^T + R_k
+     where measurement noise R_k = (0.48 * ATR_k)^2
+     Kalman Gain:           K_k = P_{k|k-1} * H^T * S_k^{-1}
+     Posterior State:       x_{k|k} = x_{k|k-1} + K_k * y_k
+     Posterior Covariance:  P_{k|k} = (I - K_k * H) * P_{k|k-1}
+
+
+B. HURST EXPONENT (RESCALED RANGE R/S PERSISTENCE ANALYSIS)
+   Given log returns r_1, r_2, ..., r_N partitioned into sub-windows of scale n:
+     Mean:                  m = (1/n) * sum_{i=1}^n r_i
+     Cumulative Deviation:  Y_t = sum_{i=1}^t (r_i - m)
+     Range:                 R(n) = max_{1<=t<=n}(Y_t) - min_{1<=t<=n}(Y_t)
+     Standard Deviation:    S(n) = sqrt( (1/n) * sum_{i=1}^n (r_i - m)^2 )
+     Scaling Law:           E[ R(n) / S(n) ] = C * n^H
+   Estimated via Ordinary Least Squares (OLS) slope of log(R/S) vs log(n) for
+   n in {8, 16, 32, 64}:
+     - H > 0.55 : Persistent Trend-Following Regime (positive memory)
+     - H = 0.50 : Geometric Brownian Motion / Random Walk
+     - H < 0.45 : Anti-Persistent Mean-Reverting Regime
+
+
+C. ORNSTEIN-UHLENBECK (OU) STOCHASTIC DIFFERENTIAL EQUATION
+   Continuous-time mean-reverting SDE:
+     dX_t = theta * (mu - X_t) dt + sigma_OU dW_t
+
+   Discrete AR(1) calibration on closes:
+     X_t - X_{t-1} = a + b * X_{t-1} + epsilon_t
+     Mean-Reversion Speed:  theta = -ln(1 + b)
+     Long-Run Equilibrium:  mu = -a / b
+     Mean-Reversion Half-Life (50% decay time):
+                            tau_{1/2} = ln(2) / theta
+     Equilibrium Z-Score:   Z_OU = (X_t - mu) / (sigma_epsilon / sqrt(2 * theta))
+
+
+D. YANG-ZHANG DRIFT-INDEPENDENT REALIZED VOLATILITY (sigma_YZ)
+   Minimum-variance unbiased estimator combining overnight jumps and intraday
+   Rogers-Satchell volatility over window n:
+     sigma_O^2  = Var( ln(Open_t / Close_{t-1}) )
+     sigma_C^2  = Var( ln(Close_t / Open_t) )
+     sigma_RS^2 = (1/n) * sum [ ln(H_t/C_t)*ln(H_t/O_t) + ln(L_t/C_t)*ln(L_t/O_t) ]
+     k          = 0.34 / (1.34 + (n + 1)/(n - 1))
+     sigma_YZ   = sqrt( sigma_O^2 + k * sigma_C^2 + (1 - k) * sigma_RS^2 )
+
+
+E. GARCH(1,1) CONDITIONAL VOLATILITY FORECAST
+   Autoregressive conditional heteroskedasticity variance recursion:
+     sigma_t^2 = omega + alpha * r_{t-1}^2 + beta * sigma_{t-1}^2
+     with institutional crypto parameters omega = 10^{-6}, alpha = 0.14,
+     beta = 0.82 (alpha + beta = 0.96 < 1 for stationarity).
+     h-bar Forecast Cone:
+       68% Interval = Forecast_h +/- 1.00 * sigma_t * sqrt(h)
+       95% Interval = Forecast_h +/- 1.96 * sigma_t * sqrt(h)
+
+
+F. FIRST-PASSAGE BARRIER CROSSING PROBABILITY (DRIFT-DIFFUSION PDE)
+   Given entry price E, distance to Take-Profit B = |TP - E|, distance to
+   Stop-Loss A = |E - SL|, Kalman drift per bar mu_d, and volatility sigma:
+     Peclet Parameter:      lambda_p = (2 * mu_d) / sigma^2
+     Exact Analytical Hitting Probability P(tau_TP < tau_SL):
+       If |lambda_p| -> 0:
+         P(Hit TP before SL) = A / (A + B)
+       If |lambda_p| > 0:
+         P(Hit TP before SL) = (1 - exp(-lambda_p * A)) / (exp(lambda_p * B) - exp(-lambda_p * A))
+
+   Expected Median First-Passage Touch Time (Inverse Gaussian Law):
+     n_{50%} = ( Distance / (0.6745 * sigma) )^2  bars
+
+
+G. VPIN (VOLUME-SYNCHRONIZED PROBABILITY OF INFORMED TRADING) & KYLE'S LAMBDA
+   Volume-bucketed order flow toxicity across M equal-volume buckets of size V_b:
+     VPIN = (1 / (M * V_b)) * sum_{tau=1}^M | V_tau^{Buy} - V_tau^{Sell} |
+
+   Kyle's Lambda Market Impact Coefficient:
+     Delta P_t = lambda * OFI_t + epsilon_t
+     lambda = Cov(Delta P, OFI) / Var(OFI)   (in USD per 1 BTC net order flow)
+
+   Iceberg Absorption Refill Ratio at Price Bucket p:
+     I_p = V_{executed}(p) / max(0.25, V_{visible}(p))
+
+
+H. CONTINUOUS KELLY CRITERION & GEOMETRIC WEALTH COMPOUNDING
+   Given win probability p = P(tau_TP < tau_SL), loss probability q = 1 - p,
+   and net reward-to-risk payoff ratio b = R_win / R_loss:
+     Full Kelly Fraction:      f* = p - (q / b) = (p * b - q) / b
+     Quarter-Kelly Safe Size:  f_{0.25} = 0.25 * f*
+     Expected Value per Trade: EV_R = p * R_TP - q * 1.0 - Fee_R
+     Contract Quantity (BTC):  Q_BTC = Risk_USD / |Entry - SL|
+     Geometric Equity Growth after t sessions at daily growth rate g:
+                               W_t = W_0 * (1 + g)^t
+================================================================================
