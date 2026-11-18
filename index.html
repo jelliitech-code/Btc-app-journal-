@@ -3,6 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <title>Quant Glass · Wall Street Institutional BTCUSDT Terminal</title>
 <script src="https://cdn.jsdelivr.net/npm/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
@@ -901,6 +904,42 @@ body.sbo .dock { left: calc(50% + 148px); }
 }
 @keyframes s { to { transform: rotate(360deg); } }
 
+
+/* ============================ LOGIN GATE ============================ */
+body.locked > :not(#login-gate):not(script) { display: none !important; }
+#login-gate { display: none; }
+body.locked #login-gate {
+  position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center;
+  padding: 20px; background: var(--bg); background-image: var(--bg-grad);
+}
+.lg-card {
+  width: min(420px, 100%); background: var(--pn);
+  backdrop-filter: blur(44px) saturate(190%); -webkit-backdrop-filter: blur(44px) saturate(190%);
+  border: 1px solid var(--bd-strong); border-radius: 32px; padding: 34px 30px 26px; box-shadow: var(--sh);
+}
+.lg-card h1 { font-family: var(--font-Display); font-size: 24px; letter-spacing: -0.5px; margin: 14px 0 4px; }
+.lg-card p.sub { color: var(--mt); font-size: 13px; margin-bottom: 22px; }
+.lg-field { display: block; margin-bottom: 14px; }
+.lg-field span { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--mt); margin: 0 0 6px 6px; }
+.lg-field input {
+  width: 100%; background: var(--p2); border: 1px solid var(--bd); border-radius: 999px;
+  padding: 12px 18px; font-size: 15px; outline: none; transition: border-color .15s, box-shadow .15s;
+}
+.lg-field input:focus { border-color: var(--tx); box-shadow: 0 0 0 3px var(--ac-soft); }
+.lg-pw { position: relative; }
+.lg-pw button {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: 0;
+  color: var(--mt); font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 999px;
+}
+.lg-btn { width: 100%; padding: 13px; font-size: 15px; margin-top: 6px; }
+.lg-btn:disabled { opacity: .5; cursor: not-allowed; }
+.lg-err { min-height: 20px; color: var(--r); font-size: 12.5px; text-align: center; margin-top: 12px; }
+.lg-foot { color: var(--mt); font-size: 11px; text-align: center; margin-top: 14px; line-height: 1.5; }
+.disc {
+  max-width: 1440px; margin: 0 auto; padding: 0 24px 24px; color: var(--mt); font-size: 11.5px; line-height: 1.55; text-align: center;
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
 @media print {
   .sb, .dock, .hd, .top-tabs, .macro-bar, #bk, .md { display: none !important; }
   .ct { margin: 0 !important; }
@@ -918,9 +957,262 @@ body.sbo .dock { left: calc(50% + 148px); }
   .pt h1 { font-size: 24px; }
   .card { padding: 18px; }
 }
+
+/* ==========================================================================
+   DESIGN V2 · Calm institutional "Liquid Glass"
+   Layered on top of the base system. Tokens, then surfaces, then components.
+   ========================================================================== */
+:root {
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --font-Display: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  --acc2: #5ac8fa;
+  --hl: rgba(255, 255, 255, 0.9);
+  --orb1: rgba(90, 120, 255, 0.16);
+  --orb2: rgba(255, 140, 90, 0.12);
+  --orb3: rgba(60, 200, 170, 0.12);
+  --bg: #eef1f7;
+  --bg-grad: linear-gradient(180deg, #f4f6fb 0%, #e9edf5 100%);
+  --pn: rgba(255, 255, 255, 0.66);
+  --p2: rgba(60, 70, 100, 0.06);
+  --p3: rgba(60, 70, 100, 0.12);
+  --bd: rgba(20, 30, 60, 0.08);
+  --bd-strong: rgba(20, 30, 60, 0.15);
+  --glass: rgba(255, 255, 255, 0.72);
+  --tx: #0b1220;
+  --mt: #5b6575;
+  --g: #168a45;
+  --r: #d0382a;
+  --a: #a06a00;
+  --sh: 0 1px 0 rgba(255,255,255,.9) inset, 0 10px 30px rgba(30, 45, 90, 0.08), 0 2px 6px rgba(30, 45, 90, 0.05);
+}
+[data-t="dark"] {
+  --hl: rgba(255, 255, 255, 0.34);
+  --orb1: rgba(70, 100, 255, 0.20);
+  --orb2: rgba(255, 110, 70, 0.11);
+  --orb3: rgba(40, 200, 160, 0.13);
+  --bg: #06070a;
+  --bg-grad: linear-gradient(180deg, #0a0c11 0%, #05060a 100%);
+  --pn: rgba(24, 27, 35, 0.52);
+  --p2: rgba(255, 255, 255, 0.05);
+  --p3: rgba(255, 255, 255, 0.10);
+  --bd: rgba(255, 255, 255, 0.08);
+  --bd-strong: rgba(255, 255, 255, 0.16);
+  --glass: rgba(16, 18, 25, 0.62);
+  --tx: #f4f6fa;
+  --mt: #8e97a8;
+  --g: #32d74b;
+  --r: #ff5a52;
+  --a: #ffd60a;
+  --sh: 0 1px 0 rgba(255,255,255,.07) inset, 0 18px 50px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+html { scroll-behavior: smooth; }
+body { font-feature-settings: "cv11", "ss01"; letter-spacing: -0.005em; }
+body::before {
+  content: ""; position: fixed; inset: -25%; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(38% 34% at 14% 12%, var(--orb1), transparent 70%),
+    radial-gradient(34% 30% at 86% 18%, var(--orb2), transparent 70%),
+    radial-gradient(42% 40% at 60% 96%, var(--orb3), transparent 70%);
+  animation: drift 32s ease-in-out infinite alternate;
+}
+@keyframes drift { from { transform: translate3d(-2%, -1%, 0) scale(1); } to { transform: translate3d(3%, 2%, 0) scale(1.08); } }
+:focus-visible { outline: 2px solid var(--acc2); outline-offset: 3px; border-radius: 12px; }
+::selection { background: var(--ac-soft); }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: var(--p3); border-radius: 999px; border: 2px solid transparent; background-clip: content-box; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---- gradient hairline borders on surfaces ---- */
+.card, .kp, .exec-ticket, .lg-card, .sb, .dock, .hd, .mb { position: relative; }
+.card::before, .kp::before, .exec-ticket::before, .lg-card::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1px; pointer-events: none;
+  background: linear-gradient(155deg, var(--hl), transparent 38%, transparent 62%, rgba(255,255,255,.08));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; opacity: .55;
+}
+.sb, .dock, .hd, .mb { position: fixed; }
+.hd { position: sticky; }
+.mb { position: relative; }
+
+/* ---- ticker ribbon as chips ---- */
+.macro-bar { background: transparent; border: 0; backdrop-filter: none; -webkit-backdrop-filter: none; padding: 12px 20px 2px; gap: 8px; scrollbar-width: none; }
+.macro-bar::-webkit-scrollbar { display: none; }
+.macro-item { padding: 5px 12px; border-radius: 999px; background: var(--p2); border: 1px solid var(--bd); font-size: 10.5px; letter-spacing: .02em; }
+.macro-item b { font-variant-numeric: tabular-nums; }
+
+/* ---- floating header ---- */
+.hd { margin: 10px 16px 0; top: 10px; border: 1px solid var(--bd-strong); border-radius: 26px; padding: 10px 16px; box-shadow: var(--sh); gap: 10px; }
+.brand-badge { background: var(--p2); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+.brand-dot { background: var(--g); box-shadow: 0 0 0 0 var(--g); animation: pulse 2.2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--g) 60%, transparent); } 70% { box-shadow: 0 0 0 9px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+#px { font: 700 22px var(--font-mono); letter-spacing: -0.04em; font-variant-numeric: tabular-nums; min-width: 9ch; display: inline-block; border-radius: 8px; padding: 0 4px; }
+#px.fu { animation: fup .7s ease-out; }
+#px.fd { animation: fdn .7s ease-out; }
+@keyframes fup { 0% { background: color-mix(in srgb, var(--g) 28%, transparent); } 100% { background: transparent; } }
+@keyframes fdn { 0% { background: color-mix(in srgb, var(--r) 28%, transparent); } 100% { background: transparent; } }
+#stt { font: 500 11px var(--font-mono); }
+#sess-left { font-size: 11px; padding: 4px 10px; border-radius: 999px; background: var(--p2); border: 1px solid var(--bd); }
+
+/* ---- buttons ---- */
+.ib, .btn { transition: transform .2s cubic-bezier(.22,1,.36,1), background .2s, box-shadow .2s, opacity .2s; }
+.ib:active, .btn:active { transform: scale(.97); }
+.btn { background: var(--tx); color: var(--bg); box-shadow: 0 6px 18px rgba(0,0,0,.25); }
+
+/* ---- segmented control with sliding thumb ---- */
+.seg2 { position: relative; padding: 3px; background: var(--p2); }
+.seg2 > .thumb { position: absolute; top: 3px; bottom: 3px; left: 3px; width: 0; border-radius: 999px; background: var(--tx);
+  box-shadow: 0 4px 14px rgba(0,0,0,.25); transition: transform .38s cubic-bezier(.34,1.4,.64,1), width .38s cubic-bezier(.34,1.4,.64,1); pointer-events: none; }
+.seg2 button { position: relative; z-index: 1; }
+.seg2.has-thumb button.on { background: transparent; color: var(--bg); box-shadow: none; }
+
+/* ---- tab pills ---- */
+.top-tabs { padding: 14px 20px 8px; scrollbar-width: none; gap: 8px;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 44px), transparent 100%);
+          mask-image: linear-gradient(90deg, transparent 0, #000 22px, #000 calc(100% - 44px), transparent 100%); }
+.top-tabs::-webkit-scrollbar { display: none; }
+.top-tabs button { padding: 8px 17px; background: var(--pn); }
+.top-tabs button.on { background: var(--tx); color: var(--bg); border-color: transparent; box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+.top-tabs .tab-badge { font-size: 9px; letter-spacing: .06em; opacity: .85; }
+
+/* ---- page title ---- */
+main { padding-top: 4px; }
+.pt h1 { font-size: clamp(26px, 3.1vw, 38px); letter-spacing: -0.045em; font-weight: 800;
+  background: linear-gradient(180deg, var(--tx) 30%, var(--mt)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.pt p { font-size: 14px; max-width: 70ch; }
+
+/* ---- cards ---- */
+.card { border-radius: 30px; padding: 24px 26px; box-shadow: var(--sh); }
+.card h3 { font-size: 15px; font-weight: 650; letter-spacing: -0.02em; margin-bottom: 16px; }
+.card h3 small { padding: 3px 10px; border-radius: 999px; background: var(--p2); border: 1px solid var(--bd); font-size: 10px; letter-spacing: .02em; white-space: nowrap; }
+.pn.entering > *, .pn.entering > div > * { animation: rise .55s cubic-bezier(.22,1,.36,1) backwards; }
+.pn.entering > *:nth-child(2), .pn.entering > div > *:nth-child(2) { animation-delay: .04s; }
+.pn.entering > *:nth-child(3), .pn.entering > div > *:nth-child(3) { animation-delay: .08s; }
+.pn.entering > *:nth-child(4), .pn.entering > div > *:nth-child(4) { animation-delay: .12s; }
+.pn.entering > *:nth-child(5), .pn.entering > div > *:nth-child(5) { animation-delay: .16s; }
+.pn.entering > *:nth-child(n+6), .pn.entering > div > *:nth-child(n+6) { animation-delay: .2s; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* ---- KPI cards: one hero number each ---- */
+.kg { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+@media (min-width: 1100px) { #ov .kg { grid-template-columns: repeat(3, 1fr); } }
+.kp { border-radius: 28px; padding: 20px 22px 18px; overflow: hidden; transition: transform .25s cubic-bezier(.22,1,.36,1), box-shadow .25s; }
+.kp:hover { transform: translateY(-3px); box-shadow: var(--sh), 0 14px 40px color-mix(in srgb, var(--kc, #000) 22%, transparent); }
+.kp::after { content: ""; position: absolute; left: 22px; right: 22px; top: 0; height: 2px; border-radius: 0 0 4px 4px; background: var(--kc, transparent); opacity: .9; }
+.kp.g { --kc: var(--g); background-image: radial-gradient(110% 80% at 0% 0%, var(--g-bg), transparent 62%); }
+.kp.r { --kc: var(--r); background-image: radial-gradient(110% 80% at 0% 0%, var(--r-bg), transparent 62%); }
+.kp.a { --kc: var(--a); background-image: radial-gradient(110% 80% at 0% 0%, var(--a-bg), transparent 62%); }
+.kp small { font-size: 10.5px; letter-spacing: .09em; color: var(--mt); }
+.kp b { font: 700 clamp(21px, 2vw, 29px)/1.15 var(--font-mono); letter-spacing: -0.045em; font-variant-numeric: tabular-nums; margin: 10px 0 8px; overflow-wrap: anywhere; }
+.kp span { font-size: 12px; line-height: 1.45; }
+
+/* ---- verdict / briefing ---- */
+.vd { border-radius: 26px; padding: 18px 22px; line-height: 1.65; border-left: 3px solid var(--bd-strong); }
+.vd.g { border-left-color: var(--g); } .vd.r { border-left-color: var(--r); } .vd.a { border-left-color: var(--a); }
+.card p { line-height: 1.7; }
+
+/* ---- bias gauge ---- */
+.gg { height: 12px; margin: 24px 0 12px; box-shadow: inset 0 1px 3px rgba(0,0,0,.35); }
+.gg::after { content: ""; position: absolute; left: 50%; top: -5px; width: 2px; height: 22px; background: var(--bd-strong); transform: translateX(-1px); border-radius: 2px; }
+.gg i { top: -2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transform: translateX(-8px);
+  box-shadow: 0 0 0 4px var(--ac-soft), 0 6px 16px rgba(0,0,0,.45); transition: left .8s cubic-bezier(.34,1.5,.64,1); z-index: 1; }
+
+/* ---- tables ---- */
+.tw { border-radius: 22px; background: var(--p2); border-color: var(--bd); }
+th { font: 600 10px var(--font-sans); letter-spacing: .09em; padding: 12px 16px; background: var(--glass); }
+td { padding: 13px 16px; border-bottom: 1px solid var(--bd); font-variant-numeric: tabular-nums; transition: background .15s; }
+tr:last-child td { border-bottom: 0; }
+tr[onclick]:hover td { background: var(--p3); }
+.hg { background: color-mix(in srgb, var(--g) 13%, transparent); }
+.hr { background: color-mix(in srgb, var(--r) 13%, transparent); }
+.ha { background: color-mix(in srgb, var(--a) 14%, transparent); }
+td:first-child { font-weight: 600; }
+
+/* ---- tags, rows ---- */
+.tg { padding: 3px 11px; font-size: 10.5px; letter-spacing: .02em; }
+.lv { padding: 11px 0; }
+.lv b { font-variant-numeric: tabular-nums; }
+.bx s { height: 10px; transition: width .8s cubic-bezier(.22,1,.36,1); }
+
+/* ---- execution ticket ---- */
+.exec-ticket { border-radius: 32px; padding: 28px; }
+.ticket-box { border-radius: 24px; transition: transform .2s, background .2s; }
+.ticket-box:hover { transform: translateY(-2px); background: var(--p3); }
+.ticket-box b { font-size: 20px; letter-spacing: -0.04em; }
+.prob-meter { height: 12px; }
+
+/* ---- bottom dock ---- */
+.dock { padding: 7px 9px; gap: 2px; border-radius: 999px; box-shadow: var(--sh), 0 20px 60px rgba(0,0,0,.35); scrollbar-width: none; }
+.dock::-webkit-scrollbar { display: none; }
+.dock button { border-radius: 999px; padding: 8px 6px 7px; transition: color .2s, background .25s, transform .25s cubic-bezier(.34,1.5,.64,1); position: relative; }
+.dock button:hover { color: var(--tx); transform: translateY(-3px) scale(1.06); }
+.dock button.on { background: var(--p3); color: var(--tx); box-shadow: inset 0 1px 0 var(--hl), 0 6px 18px rgba(0,0,0,.25); }
+.dock button.on::after { content: ""; position: absolute; bottom: 2px; width: 4px; height: 4px; border-radius: 50%; background: var(--acc2); box-shadow: 0 0 8px var(--acc2); }
+.dock button.on svg { stroke: var(--acc2); }
+
+/* ---- sidebar ---- */
+.sr.on { background: var(--tx); color: var(--bg); }
+.sw input:checked { background: var(--g); }
+
+/* ---- chart ---- */
+#ch { border-radius: 24px; }
+.clg { border-radius: 16px; }
+
+/* ---- modal ---- */
+.mb { border-radius: 34px; animation: rise .35s cubic-bezier(.22,1,.36,1); }
+
+/* ---- footer ---- */
+.disc { padding-bottom: 36px; opacity: .85; }
+
+/* ---- login ---- */
+.lg-card { border-radius: 36px; padding: 40px 34px 28px; }
+.lg-card h1 { font-size: 28px; font-weight: 800; letter-spacing: -0.045em; }
+.lg-field input { padding: 14px 20px; font-size: 15px; }
+.lg-btn { border-radius: 999px; padding: 15px; font-weight: 650; }
+
+/* ---- toasts ---- */
+#toasts { position: fixed; top: 16px; right: 16px; z-index: 200; display: flex; flex-direction: column; gap: 10px; pointer-events: none; }
+.toast { pointer-events: auto; display: flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 20px; background: var(--glass);
+  backdrop-filter: blur(30px) saturate(190%); -webkit-backdrop-filter: blur(30px) saturate(190%); border: 1px solid var(--bd-strong); box-shadow: var(--sh);
+  font-size: 12.5px; font-weight: 550; animation: toastin .45s cubic-bezier(.34,1.4,.64,1); max-width: min(380px, 90vw); }
+.toast i { width: 8px; height: 8px; border-radius: 50%; background: var(--kc, var(--g)); flex: none; box-shadow: 0 0 10px var(--kc, var(--g)); }
+.toast.a { --kc: var(--a); } .toast.r { --kc: var(--r); }
+.toast.out { opacity: 0; transform: translateX(20px); transition: all .35s; }
+@keyframes toastin { from { opacity: 0; transform: translateX(30px) scale(.96); } to { opacity: 1; transform: none; } }
+
+/* ---- responsive ---- */
+@media (max-width: 900px) {
+  .hd { margin: 8px 10px 0; padding: 9px 12px; border-radius: 22px; }
+  .card { padding: 20px; border-radius: 26px; }
+  .top-tabs, .macro-bar { padding-left: 12px; padding-right: 12px; }
+  main { padding-left: 12px; padding-right: 12px; }
+  #sess-left { display: none; }
+}
+@media (max-width: 640px) {
+  .kg { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kp { padding: 16px; border-radius: 22px; }
+  .dock button { min-width: 56px; }
+  #px { font-size: 19px; }
+}
+@media (max-width: 420px) { .kg { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { body::before, .brand-dot { animation: none !important; } }
 </style>
 </head>
-<body>
+<body class="locked">
+<div id="login-gate" role="dialog" aria-modal="true" aria-label="Sign in">
+  <form class="lg-card" id="lg-form" autocomplete="off" novalidate>
+    <div class="brand-badge"><span class="brand-dot"></span><span>WALL STREET · APPLE LIQUID GLASS</span></div>
+    <h1>Secure Terminal Access</h1>
+    <p class="sub">Sign in to open the Quant Glass BTCUSDT desk. Sessions last 12 hours.</p>
+    <label class="lg-field"><span>Username</span><input id="lg-user" type="text" autocapitalize="off" autocorrect="off" spellcheck="false" required></label>
+    <label class="lg-field"><span>Password</span>
+      <div class="lg-pw"><input id="lg-pass" type="password" autocomplete="new-password" required><button type="button" id="lg-eye" aria-label="Show password">Show</button></div>
+    </label>
+    <button class="btn lg-btn" id="lg-go" type="submit">Sign in</button>
+    <div class="lg-err" id="lg-err" role="alert" aria-live="polite"></div>
+    <div class="lg-foot">Decision-support tool only. Not financial advice.</div>
+  </form>
+</div>
 <!-- APPLE LIQUID GLASS SIDEBAR -->
 <aside class="sb" id="sb">
   <div class="sbh">
@@ -1010,6 +1302,8 @@ body.sbo .dock { left: calc(50% + 148px); }
     <div id="hdr-brand-quick" hidden></div>
     <button class="ib" id="btn-refresh" onclick="refresh(1)" title="Force Live Re-Sync">↻ Sync</button>
     <small id="stt">initializing…</small>
+    <small id="sess-left" class="mt mono"></small>
+    <button class="ib" id="btn-logout" title="Sign out now">Log out</button>
   </header>
 
   <!-- PRIMARY CAPSULE NAVIGATION BAR (13 INSTITUTIONAL TABS) -->
@@ -1137,6 +1431,7 @@ body.sbo .dock { left: calc(50% + 148px); }
       <div id="nl"></div>
     </section>
   </main>
+  <footer class="disc">Decision-support analytics only. Nothing here is financial advice or a guarantee of profit. Forecasts and probabilities are model estimates with uncertainty; backtests exclude real-world slippage and liquidity limits. Trade only what you can afford to lose.</footer>
 </div>
 
 <!-- FLOATING APPLE VISIONOS BOTTOM DOCK -->
@@ -1202,6 +1497,7 @@ body.sbo .dock { left: calc(50% + 148px); }
   </div>
 </div>
 <div class="tip" id="tip" hidden></div>
+<div id="toasts" aria-live="polite"></div>
 
 <script>
 /* ============================================================================
@@ -1331,12 +1627,13 @@ const TFM = {'1m':1, '3m':3, '5m':5, '15m':15, '30m':30, '1h':60};
 const TFS = ['1m', '3m', '5m', '15m', '30m', '1h'], WT = {'1m':1, '3m':1.2, '5m':1.6, '15m':2.2, '30m':2.6, '1h':3.2};
 
 const J = async u => {
+  const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);   // never hang on a blocked exchange
   try {
-    const r = await fetch(u);
+    const r = await fetch(u, {signal: ctl.signal});
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return await r.json();
-  } catch (err) {
-    throw err;
+  } finally {
+    clearTimeout(to);
   }
 };
 
@@ -1630,7 +1927,7 @@ function calcQuantPredictionMetrics(X, tfStr) {
   const garchVolPts = Math.sqrt(sig2) * K.at(-1).c;
 
   const startIdx = Math.max(30, n - 181);
-  let sqErr = 0, absErr = 0, pctErr = 0, dirHits = 0, brierSum = 0, count = 0;
+  let sqErr = 0, absErr = 0, pctErr = 0, dirHits = 0, brierSum = 0, count = 0, naiveAbs = 0;
   const recentPreds = [];
   for (let i = startIdx; i < n - 1; i++) {
     const actualNext = K[i + 1].c;
@@ -1641,6 +1938,7 @@ function calcQuantPredictionMetrics(X, tfStr) {
     const err = actualNext - predNext;
     sqErr += err * err;
     absErr += Math.abs(err);
+    naiveAbs += Math.abs(actualNext - prevClose);
     pctErr += Math.abs(err) / actualNext;
     const predDir = predNext >= prevClose ? 1 : -1;
     const actDir = actualNext >= prevClose ? 1 : -1;
@@ -1666,6 +1964,12 @@ function calcQuantPredictionMetrics(X, tfStr) {
   const dirAcc = count ? (dirHits / count) * 100 : 50;
   const pointAcc = clamp(100 - mape, 0, 100);
   const brier = count ? brierSum / count : 0.25;
+  const naiveMae = count ? naiveAbs / count : 0;
+  const mase = naiveMae > 1e-9 ? mae / naiveMae : 1;
+  const pHat = count ? dirHits / count : 0.5, zz = 1.96, dn2 = 1 + zz * zz / (count || 1);
+  const wc = (pHat + zz * zz / (2 * (count || 1))) / dn2;
+  const wm = zz * Math.sqrt((pHat * (1 - pHat) + zz * zz / (4 * (count || 1))) / (count || 1)) / dn2;
+  const dirLo = count ? Math.max(0, wc - wm) * 100 : 0, dirHi = count ? Math.min(1, wc + wm) * 100 : 100;
 
   const pxNow = K.at(-1).c;
   const velNow = kfV.at(-1);
@@ -1705,7 +2009,7 @@ function calcQuantPredictionMetrics(X, tfStr) {
   };
 
   return {
-    garchVolPts, rmse, mae, mape, dirAcc, pointAcc, brier, count,
+    garchVolPts, rmse, mae, mape, dirAcc, pointAcc, brier, count, mase, naiveMae, dirLo, dirHi,
     horizons, bayes, recentPreds: recentPreds.reverse()
   };
 }
@@ -2050,7 +2354,7 @@ function computePrecisionBlueprint(t, X, W, sr, fb) {
   const evR = probTP1 * CFG.tp1 * 0.5 + probTP2 * CFG.tp2 * 0.5 - (1 - probTP1) * 1.0 - (optEntry * CFG.fee / 100 / rk);
 
   return {
-    tf: t, d, up, px, a, sigB, score: m.sc,
+    tf: t, d, up, px, a, sigB, score: m.sc, noTrade: Math.abs(m.sc) < 20,
     optEntry, mktEntry: px, sl, rk, tp1, tp2, tp3,
     beTrigger, trailOffset,
     probTP1, probTP2, probTP3,
@@ -2178,6 +2482,10 @@ function updateMacroRibbon() {
    ============================================================================ */
 let ch, cs, kfSeries;
 function initChart() {
+  if (typeof LightweightCharts === 'undefined') {
+    $('#ch').innerHTML = '<small style="display:block;padding:24px">Chart library could not load (network or CDN blocked). All other tabs still work.</small>';
+    return;
+  }
   ch = LightweightCharts.createChart($('#ch'), {
     autoSize: true,
     crosshair: {mode: 0},
@@ -2225,6 +2533,7 @@ const ln = (p, c, t, s = 2) => PL.push(cs.createPriceLine({price: p, color: c, l
 
 function draw() {
   const {X, sr, fb, PD, DO, px, pv, tv, bp} = Z, K = D.K, vw = X.V.at(-1);
+  if (!cs) return;
   cs.setData(K.map(k => ({time: k.t, open: k.o, high: k.h, low: k.l, close: k.c})));
   if (T.kf && X.kfP) {
     kfSeries.setData(K.map((k, i) => ({time: k.t, value: X.kfP[i]})));
@@ -2321,6 +2630,7 @@ function rD() {
         <div>
           ${tag('DAILY TARGET ENGINE · $' + fp2(dtGoal) + ' / DAY', 'g')}
           ${tag('MAX-HEAP #1 PICK: ' + bestBP.tf + ' ' + (bestBP.d > 0 ? 'LONG' : 'SHORT'), 'ac')}
+          ${bestBP.noTrade ? tag('NO-TRADE ZONE · |score| < 20', 'a') : ''}
           <h2 style="margin-top:8px;font-family:var(--font-Display)">Institutional $${fp2(dtGoal)}/Day Quantitative Execution Plan</h2>
         </div>
         <div style="text-align:right">
@@ -2366,6 +2676,11 @@ function rD() {
         <b>Mathematical Execution Rule:</b> To capture <b>$${fp2(dtGoal)}/day</b> with a <b>$${fp2(rkUsd)}</b> risk unit (1R), you require exactly <b>+${reqNetR.toFixed(2)}R net</b> per session.
         The <b>Binary Max-Heap Priority Queue</b> ranks <b>${bestBP.tf} ${bestBP.d > 0 ? 'LONG' : 'SHORT'}</b> at <b>${fp(bestBP.optEntry)}</b> (Stop <b>${fp(bestBP.sl)}</b>, TP1 <b>${fp(bestBP.tp1)}</b>, TP2 <b>${fp(bestBP.tp2)}</b>) as the highest-expectancy setup right now with <b>${(bestBP.probTP1 * 100).toFixed(1)}%</b> first-passage barrier probability.
       </p>
+      <div class="vd ${bestBP.evR < 0 || dailyRateFixed > 0.01 ? 'a' : 'g'}" style="margin:14px 0 0;font-size:13px">
+        <b>Reality check:</b> $${fp2(dtGoal)}/day on $${fp2(eqCap)} is <b>${(dailyRateFixed * 100).toFixed(2)}% per day</b>${dailyRateFixed > 0.005 ? ' — far above what professional funds sustain (they typically aim for a few percent per month), so hitting it every day would need high leverage and large drawdown risk' : ''}.
+        ${bestBP.evR < 0 ? 'The current top setup also has <b>negative model expectancy (' + bestBP.evR.toFixed(2) + 'R)</b>, so the engine does not see an edge right now.' : 'Model expectancy is an estimate, not a promise.'}
+        Daily results vary widely; treat the target as a ceiling to stop at, never a quota to force.
+      </div>
     </div>
 
     <div class="card">
@@ -2809,7 +3124,7 @@ function rX() {
     <div class="exec-ticket">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
         <div>
-          ${tag(bp.d > 0 ? 'INSTITUTIONAL LONG BLUEPRINT' : 'INSTITUTIONAL SHORT BLUEPRINT', bp.d > 0 ? 'g' : 'r')}
+          ${bp.noTrade ? tag('NO-TRADE · SCORE INSIDE ±20 BAND (levels below are reference only)', 'a') : tag(bp.d > 0 ? 'INSTITUTIONAL LONG BLUEPRINT' : 'INSTITUTIONAL SHORT BLUEPRINT', bp.d > 0 ? 'g' : 'r')}
           ${tag(tf + ' TIMEFRAME', 'ac')}
           ${tag('EV ' + (bp.evR >= 0 ? '+' : '') + bp.evR.toFixed(2) + 'R', bp.evR >= 0 ? 'g' : 'a')}
           <h2 style="margin-top:6px;font-family:var(--font-Display)">Precision Entry &amp; Exit Coordinates · BTCUSDT Perpetual</h2>
@@ -2978,12 +3293,12 @@ function rAI() {
       Combines a 2-State Kinematic <b>Kalman Filter</b> (x̂_t = ${fp(kfNow)}, velocity v̂_t = ${kfVel > 0 ? '+' : ''}${kfVel.toFixed(2)} pts/bar, Kalman Gain K_t = ${kfG.toFixed(3)}),
       <b>Ornstein-Uhlenbeck SDE</b> (θ = ${X.OU.theta.toFixed(4)}, μ = ${fp(X.OU.mu)}), and
       <b>GARCH(1,1) Conditional Volatility</b> (σ_{t+1} = ±${fp(pred.garchVolPts)} pts).
-      Walk-forward out-of-sample point accuracy across the last ${pred.count} closed bars is <b>${pred.pointAcc.toFixed(2)}%</b> (MAPE ${pred.mape.toFixed(3)}%, RMSE ${fp(pred.rmse)} pts).
+      Out-of-sample over the last ${pred.count} closed bars, MASE vs a naive no-change forecast is <b>${pred.mase.toFixed(2)}</b> (${pred.mase < 1 ? 'beats' : 'does not beat'} the baseline). MAPE of ${pred.mape.toFixed(3)}% looks tiny only because price barely moves per bar, so it is not a skill measure. RMSE ${fp(pred.rmse)} pts.
     </div>
 
     <div class="kg">
-      ${kp('Walk-Forward Point Accuracy', pred.pointAcc.toFixed(2) + '%', '100% − MAPE (' + pred.mape.toFixed(3) + '%) over ' + pred.count + ' bars', 'g')}
-      ${kp('Directional Hit Rate', pred.dirAcc.toFixed(1) + '%', 'Out-of-sample sign accuracy', pred.dirAcc >= 52 ? 'g' : 'a')}
+      ${kp('Forecast Skill (MASE vs naive)', pred.mase.toFixed(2), '< 1.00 beats no-change baseline · n=' + pred.count, pred.mase < 1 ? 'g' : 'a')}
+      ${kp('Directional Hit Rate', pred.dirAcc.toFixed(1) + '%', '95% CI ' + pred.dirLo.toFixed(0) + '–' + pred.dirHi.toFixed(0) + '% · 50% = coin flip', pred.dirLo > 50 ? 'g' : 'a')}
       ${kp('Kalman 1-Bar Point Forecast', fp(h1.pt), pc(h1.pt, Z.px) + ' · P(Up) ' + (h1.pUp * 100).toFixed(1) + '%', h1.pt >= Z.px ? 'g' : 'r')}
       ${kp('Kalman 3-Bar Point Forecast', fp(h3.pt), pc(h3.pt, Z.px) + ' · ' + h3.mins + 'm ahead', h3.pt >= Z.px ? 'g' : 'r')}
       ${kp('Out-of-Sample RMSE / MAE', fp(pred.rmse) + ' pts', 'MAE: ' + fp(pred.mae) + ' pts · Brier: ' + pred.brier.toFixed(3))}
@@ -3029,7 +3344,7 @@ function rAI() {
 
     <div class="card">
       <h3>Cross-Timeframe Point Accuracy &amp; Kalman Forecast Audit</h3>
-      ${TH(['Timeframe', 'Spot Price', 'Kalman State', '1-Bar Point Forecast', '3-Bar Point Forecast', 'Point Accuracy (100−MAPE)', 'Directional Hit %', 'Out-of-Sample RMSE', 'Out-of-Sample MAE', 'Brier Score'])}
+      ${TH(['Timeframe', 'Spot Price', 'Kalman State', '1-Bar Point Forecast', '3-Bar Point Forecast', 'MASE vs Naive (<1 = skill)', 'Directional Hit %', 'Out-of-Sample RMSE', 'Out-of-Sample MAE', 'Brier Score'])}
       ${TFS.map(t => {
         const a = AL[t], p = a.pred;
         return `<tr onclick="switchTF('${t}')">
@@ -3038,7 +3353,7 @@ function rAI() {
           <td>${fp(a.X.kfP.at(-1))}</td>
           <td class="${p.horizons[0].pt >= a.px ? 'g' : 'r'}"><b>${fp(p.horizons[0].pt)}</b></td>
           <td class="${p.horizons[1].pt >= a.px ? 'g' : 'r'}">${fp(p.horizons[1].pt)}</td>
-          <td class="hg"><b>${p.pointAcc.toFixed(2)}%</b></td>
+          <td class="${p.mase < 1 ? 'hg' : 'ha'}"><b>${p.mase.toFixed(2)}</b></td>
           <td class="${p.dirAcc >= 52 ? 'g' : 'a'}">${p.dirAcc.toFixed(1)}%</td>
           <td>${fp(p.rmse)} pts</td>
           <td>${fp(p.mae)} pts</td>
@@ -3273,16 +3588,16 @@ function rO() {
   const al = M.filter(m => Math.abs(tot) >= 15 && sg(m.sc) === sg(tot)).map(m => m.t);
   const bpCur = Z.bp;
 
-  const txt = `Composite Multi-Timeframe Institutional Bias is <b class="${cl(tot)}">${lb}</b> (${tot > 0 ? '+' : ''}${tot.toFixed(0)}/100). ${al.length ? `Synchronized timeframes: <b>${al.join(', ')}</b>.` : 'Timeframes are currently dispersed; prioritize mean-reversion & range extremes.'} On the active <b>${tf}</b> desk, the <b>Kalman Filter</b> estimates latent fair value at <b>${fp(Z.X.kfP.at(-1))}</b> (1-bar point forecast: <b>${fp(Z.pred.horizons[0].pt)}</b>, walk-forward point accuracy: <b>${Z.pred.pointAcc.toFixed(2)}%</b>). The <b>${tf} Precision Execution Blueprint</b> signals a <b class="${bpCur.d > 0 ? 'g' : 'r'}">${bpCur.d > 0 ? 'LONG' : 'SHORT'}</b> limit entry at <b>${fp(bpCur.optEntry)}</b>, Stop-Loss <b>${fp(bpCur.sl)}</b>, TP1 <b>${fp(bpCur.tp1)}</b> (${(bpCur.probTP1 * 100).toFixed(1)}% first-passage probability), and TP2 <b>${fp(bpCur.tp2)}</b>. Across the 7-day walk-forward ledger, the engine recorded <b>${S.n}</b> closed trades (${(S.wr * 100).toFixed(0)}% win rate, <b class="${cl(S.net)}">${S.net > 0 ? '+' : ''}${S.net.toFixed(1)}R</b> net after fees).`;
+  const txt = `Composite Multi-Timeframe Institutional Bias is <b class="${cl(tot)}">${lb}</b> (${tot > 0 ? '+' : ''}${tot.toFixed(0)}/100). ${al.length ? `Synchronized timeframes: <b>${al.join(', ')}</b>.` : 'Timeframes are currently dispersed; prioritize mean-reversion & range extremes.'} On the active <b>${tf}</b> desk, the <b>Kalman Filter</b> estimates latent fair value at <b>${fp(Z.X.kfP.at(-1))}</b> (1-bar point forecast: <b>${fp(Z.pred.horizons[0].pt)}</b>, MASE vs naive no-change forecast: <b>${Z.pred.mase.toFixed(2)}</b>, directional hit ${Z.pred.dirAcc.toFixed(0)}% [95% CI ${Z.pred.dirLo.toFixed(0)}–${Z.pred.dirHi.toFixed(0)}%, n=${Z.pred.count}]). The <b>${tf} Precision Execution Blueprint</b> signals a <b class="${bpCur.d > 0 ? 'g' : 'r'}">${bpCur.d > 0 ? 'LONG' : 'SHORT'}</b> limit entry at <b>${fp(bpCur.optEntry)}</b>, Stop-Loss <b>${fp(bpCur.sl)}</b>, TP1 <b>${fp(bpCur.tp1)}</b> (${(bpCur.probTP1 * 100).toFixed(1)}% first-passage probability), and TP2 <b>${fp(bpCur.tp2)}</b>. Across the 7-day walk-forward ledger, the engine recorded <b>${S.n}</b> closed trades (${S.n >= 30 ? (S.wr * 100).toFixed(0) + '% win rate, ' : 'win rate not yet statistically meaningful, '}<b class="${cl(S.net)}">${S.net > 0 ? '+' : ''}${S.net.toFixed(1)}R</b> net after fees).`;
 
   $('#ov').innerHTML = `
     <div class="kg">
       ${kp('Spot Perpetual', fp(px), pc(px, DO) + ' vs session open', px >= DO ? 'g' : 'r')}
       ${kp('Composite MTF Bias', lb, (tot > 0 ? '+' : '') + tot.toFixed(0) + ' / 100 weighted', cl(tot))}
-      ${kp(tf + ' Precision Signal', (bpCur.d > 0 ? 'LONG ' : 'SHORT ') + fp(bpCur.optEntry), 'SL ' + fp(bpCur.sl) + ' · TP1 ' + fp(bpCur.tp1), bpCur.d > 0 ? 'g' : 'r')}
-      ${kp(tf + ' Point Accuracy', Z.pred.pointAcc.toFixed(2) + '%', '1-Bar Forecast: ' + fp(Z.pred.horizons[0].pt), 'g')}
+      ${bpCur.noTrade ? kp(tf + ' Precision Signal', 'NO-TRADE', 'Score ' + bpCur.score.toFixed(0) + ' inside ±20 neutral band', 'a') : kp(tf + ' Precision Signal', (bpCur.d > 0 ? 'LONG ' : 'SHORT ') + fp(bpCur.optEntry), 'SL ' + fp(bpCur.sl) + ' · TP1 ' + fp(bpCur.tp1), bpCur.d > 0 ? 'g' : 'r')}
+      ${kp(tf + ' Forecast Skill (MASE)', Z.pred.mase.toFixed(2), (Z.pred.mase < 1 ? 'Beats' : 'Does not beat') + ' naive baseline · Dir ' + Z.pred.dirAcc.toFixed(0) + '% (CI ' + Z.pred.dirLo.toFixed(0) + '–' + Z.pred.dirHi.toFixed(0) + '%, n=' + Z.pred.count + ')', Z.pred.mase < 1 ? 'g' : 'a')}
       ${kp('7d Net Performance', (S.net > 0 ? '+' : '') + S.net.toFixed(1) + 'R', S.n + ' closed trades (net of fees)', S.net >= 0 ? 'g' : 'r')}
-      ${kp('Win Rate & PF', Math.round(S.wr * 100) + '%', '95% CI ' + Math.round(S.lo * 100) + '–' + Math.round(S.hi * 100) + '% · PF ' + S.pf.toFixed(2))}
+      ${S.n >= 30 ? kp('Win Rate & PF', Math.round(S.wr * 100) + '%', '95% CI ' + Math.round(S.lo * 100) + '–' + Math.round(S.hi * 100) + '% · PF ' + S.pf.toFixed(2)) : kp('Win Rate & PF', 'n/a', 'Insufficient data (n=' + S.n + ' of 30 trades)', 'a')}
     </div>
 
     <div class="card">
@@ -3354,7 +3669,7 @@ function rJ() {
   const L = JR.filter(f), op = L.filter(e => e.res.o === 'OPEN'), C = L.filter(e => e.res.o !== 'OPEN'), S = stats(C);
   const P = PLN.filter(p => (JF.tf === 'all' || p.t === JF.tf) && (JF.s === 'all' || p.d === (JF.s === 'long' ? 1 : -1))), nm = JF.tf === 'all' ? 'all timeframes' : JF.tf;
   $('#jf').innerHTML = ['all', ...TFS].map(t => `<button data-t="${t}" class="${JF.tf === t ? 'on' : ''}">${t === 'all' ? 'All Timeframes' : t}</button>`).join('') + FB();
-  const v = C.length < 10
+  const v = C.length < 30
     ? ['a', `Sample size notice: ${C.length} closed trades on ${nm} in 7 days. ${JF.tf === 'all' ? TFS.reduce((s, t) => s + AL[t].blk, 0) : AL[JF.tf].blk} additional signals were filtered out by the institutional fee gate.`]
     : S.ex > 0
       ? ['g', `Positive Walk-Forward Expectancy on ${nm}: +${S.ex.toFixed(2)}R per trade net of fees across ${C.length} verified trades.`]
@@ -3363,10 +3678,10 @@ function rJ() {
     <div class="vd ${v[0]}">${v[1]}</div>
     <div class="kg">
       ${kp('Total Signals', L.length, op.length + ' currently open')}
-      ${kp('Win Rate', Math.round(S.wr * 100) + '%', 'Wilson 95% CI ' + Math.round(S.lo * 100) + '–' + Math.round(S.hi * 100) + '%')}
+      ${S.n >= 30 ? kp('Win Rate', Math.round(S.wr * 100) + '%', 'Wilson 95% CI ' + Math.round(S.lo * 100) + '–' + Math.round(S.hi * 100) + '%') : kp('Win Rate', 'n/a', 'Insufficient data (n=' + S.n + ' of 30)', 'a')}
       ${kp('Cumulative Net R', (S.net > 0 ? '+' : '') + S.net.toFixed(1) + 'R', 'Net of exchange fees', S.net >= 0 ? 'g' : 'r')}
       ${kp('Expectancy (EV)', (S.ex > 0 ? '+' : '') + S.ex.toFixed(2) + 'R', 'Per trade average', S.ex >= 0 ? 'g' : 'r')}
-      ${kp('Profit Factor', S.pf.toFixed(2), 'Gross Win / Gross Loss')}
+      ${S.n >= 30 ? kp('Profit Factor', S.pf.toFixed(2), 'Gross Win / Gross Loss') : kp('Profit Factor', 'n/a', 'Insufficient data (n=' + S.n + ' of 30)', 'a')}
       ${kp('Max Drawdown', '−' + S.dd.toFixed(1) + 'R', 'Peak-to-valley equity', 'r')}
     </div>
     <div class="cols">
@@ -3656,6 +3971,8 @@ const PG = {
 function switchTab(p) {
   if (!PG[p]) return;
   tab = p;
+  const pane = document.getElementById('p-' + p);
+  if (pane) { pane.classList.add('entering'); setTimeout(() => pane.classList.remove('entering'), 900); }
   $$('.dock button, #top-tabs button').forEach(x => x.classList.toggle('on', x.dataset.p === p));
   $$('.pn').forEach(sec => sec.classList.toggle('on', sec.id === 'p-' + p));
   $('#h1').textContent = PG[p][0];
@@ -3727,11 +4044,12 @@ async function refresh(manual = 0) {
     $('#px').textContent = fp(Z.px);
     const DO = Z.DO;
     $('#chg').innerHTML = `<span class="${Z.px >= DO ? 'g' : 'r'}">${Z.px >= DO ? '▲' : '▼'} ${Math.abs((Z.px / DO - 1) * 100).toFixed(2)}% session</span>`;
-    $('#stt').innerHTML = `<span class="g">● ${feedSource}</span> · ${ist(Date.now() / 1e3, {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false})} IST`;
+    $('#stt').innerHTML = `<span class="${feedSource.includes('SIMULATED') ? 'r' : 'g'}">● ${feedSource}${feedSource.includes('SIMULATED') ? ' (NOT LIVE · exchange unreachable)' : ''}</span> · ${ist(Date.now() / 1e3, {hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false})} IST`;
   } catch (e) {
     console.error(e);
     $('#stt').innerHTML = '<span class="a">● fallback engine active</span>';
   }
+  window.__lastOk = Date.now();
   busy = 0;
 }
 
@@ -3785,10 +4103,186 @@ const tipf = e => {
 };
 ['pointermove', 'pointerdown'].forEach(v => document.addEventListener(v, tipf));
 
-initChart();
-rN();
-refresh();
-setInterval(refresh, 30000);
+/* ---------- UX layer: sliding segmented thumb, price flash, toasts, live ticker ---------- */
+function toast(msg, kind) {
+  const box = document.getElementById('toasts');
+  const t = document.createElement('div');
+  t.className = 'toast ' + (kind || 'g');
+  t.innerHTML = '<i></i><span>' + esc(msg) + '</span>';
+  box.appendChild(t);
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 400); }, 4200);
+}
+function slideSegs() {
+  document.querySelectorAll('.seg2').forEach(seg => {
+    const on = seg.querySelector('button.on');
+    if (!on || !on.offsetWidth) return;
+    let th = seg.querySelector(':scope > .thumb');
+    if (!th) { th = document.createElement('i'); th.className = 'thumb'; seg.prepend(th); }
+    seg.classList.add('has-thumb');
+    th.style.width = on.offsetWidth + 'px';
+    th.style.transform = 'translateX(' + (on.offsetLeft - 3) + 'px)';
+  });
+}
+function initUX() {
+  let raf = 0;
+  const queue = () => { cancelAnimationFrame(raf); raf = requestAnimationFrame(slideSegs); };
+  new MutationObserver(queue).observe(document.body, {subtree: true, childList: true, attributes: true, attributeFilter: ['class']});
+  addEventListener('resize', queue);
+  queue();
+  // flash the header price on change
+  let last = null;
+  const pxEl = document.getElementById('px');
+  new MutationObserver(() => {
+    const v = parseFloat(pxEl.textContent.replace(/,/g, ''));
+    if (!isNaN(v)) {
+      if (last != null && v !== last) { pxEl.classList.remove('fu', 'fd'); void pxEl.offsetWidth; pxEl.classList.add(v > last ? 'fu' : 'fd'); }
+      last = v;
+    }
+  }).observe(pxEl, {childList: true, characterData: true, subtree: true});
+}
+let __ws, __wsBack = 1000;
+function liveTicker() {
+  try { __ws = new WebSocket('wss://fstream.binance.com/ws/btcusdt@miniTicker'); } catch (e) { return; }
+  __ws.onmessage = ev => {
+    if (!Z || !feedSource.includes('LIVE')) return;
+    let d; try { d = JSON.parse(ev.data); } catch (e) { return; }
+    const p = +d.c; if (!p) return;
+    window.__lastOk = Date.now(); __wsBack = 1000;
+    $('#px').textContent = fp(p);
+    $('#chg').innerHTML = `<span class="${p >= Z.DO ? 'g' : 'r'}">${p >= Z.DO ? '▲' : '▼'} ${Math.abs((p / Z.DO - 1) * 100).toFixed(2)}% session</span>`;
+  };
+  __ws.onclose = () => { setTimeout(liveTicker, __wsBack); __wsBack = Math.min(__wsBack * 2, 30000); };
+  __ws.onerror = () => { try { __ws.close(); } catch (e) {} };
+}
+
+function bootApp() {
+  initUX();
+  initChart();
+  rN();
+  refresh().then(() => {
+    const cur = document.querySelector('.pn.on');
+    if (cur) { cur.classList.add('entering'); setTimeout(() => cur.classList.remove('entering'), 900); }
+    const sim = feedSource.includes('SIMULATED');
+    toast(sim ? 'Exchange unreachable · showing simulated data, not live prices' : 'Live feed connected · ' + feedSource, sim ? 'a' : 'g');
+    if (!sim) liveTicker();
+  });
+  setInterval(refresh, 30000);
+  setInterval(() => {
+    if (window.__lastOk && Date.now() - window.__lastOk > 90000) {
+      $('#stt').innerHTML = '<span class="a">● DELAYED · feed lagging, retrying…</span>';
+    }
+  }, 10000);
+}
+</script>
+<script>
+/* ============================================================================
+   LOGIN GATE · PBKDF2-SHA256 (210k iterations) credential check, 12-hour session,
+   automatic logout, brute-force lockout. No plaintext credentials in this file.
+   NOTE: this is a client-side gate. For real security, also put the file behind
+   server-side auth (see README notes in chat).
+   ============================================================================ */
+const Auth = (() => {
+  const U_HASH = '43226a385bc842d09197a2c815b134792b2fe79051a984800e3eefe400d3807c';
+  const P_HASH = 'bb4b4cb4b4e9f739509a0cd030ba063b67fef1835e4f7e77cce30f5ad40c925f';
+  const SALT = 'QG-WS-2026-arsm-salt-v1', ITER = 210000;
+  const TTL = 12 * 60 * 60 * 1000, KEY = 'qg_session_v1', LKEY = 'qg_lockout_v1';
+  const MAX_FAILS = 5, LOCK_MS = 5 * 60 * 1000;
+  const enc = new TextEncoder();
+  const $g = s => document.querySelector(s);
+  let booted = false, timer = null;
+
+  const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+  async function kdf(str) {
+    const k = await crypto.subtle.importKey('raw', enc.encode(str), 'PBKDF2', false, ['deriveBits']);
+    return hex(await crypto.subtle.deriveBits({name: 'PBKDF2', salt: enc.encode(SALT), iterations: ITER, hash: 'SHA-256'}, k, 256));
+  }
+  const teq = (a, b) => { let d = a.length ^ b.length; for (let i = 0; i < Math.max(a.length, b.length); i++) d |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0); return d === 0; };
+  const read = k => { try { return JSON.parse(localStorage.getItem(k)); } catch (e) { return null; } };
+  const write = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+  const del = k => { try { localStorage.removeItem(k); } catch (e) {} };
+
+  function session() {
+    const s = read(KEY), now = Date.now();
+    if (!s || typeof s.exp !== 'number' || typeof s.iat !== 'number') return null;
+    if (s.exp <= now) return null;                 // expired
+    if (s.exp - s.iat > TTL + 1000) return null;   // tampered lifetime
+    if (now < s.iat - 60000) return null;          // clock rolled back
+    return s;
+  }
+  function fmtLeft(ms) {
+    const m = Math.max(0, Math.floor(ms / 60000)), h = Math.floor(m / 60);
+    return h + 'h ' + String(m % 60).padStart(2, '0') + 'm';
+  }
+  function tick() {
+    const s = session();
+    if (!s) return logout(true);
+    const el = $g('#sess-left');
+    if (el) el.textContent = 'session ' + fmtLeft(s.exp - Date.now());
+  }
+  function enter() {
+    document.body.classList.remove('locked');
+    $g('#lg-pass').value = '';
+    if (!booted) { booted = true; bootApp(); }
+    tick();
+    clearInterval(timer);
+    timer = setInterval(tick, 15000);
+  }
+  function logout(expired) {
+    del(KEY);
+    clearInterval(timer);
+    try { sessionStorage.setItem('qg_msg', expired ? 'Session expired after 12 hours. Please sign in again.' : 'Signed out.'); } catch (e) {}
+    location.reload();   // wipes in-memory market data and timers
+  }
+  function lockLeft() {
+    const l = read(LKEY);
+    return l && l.until > Date.now() ? l.until - Date.now() : 0;
+  }
+  function err(msg) { $g('#lg-err').textContent = msg; }
+
+  async function submit(e) {
+    e.preventDefault();
+    const left = lockLeft();
+    if (left) return err('Too many attempts. Try again in ' + Math.ceil(left / 1000) + 's.');
+    if (!(window.crypto && crypto.subtle)) return err('Secure crypto unavailable. Open this page over https:// or localhost.');
+    const u = $g('#lg-user').value.trim(), p = $g('#lg-pass').value;
+    if (!u || !p) return err('Enter username and password.');
+    const btn = $g('#lg-go'); btn.disabled = true; btn.textContent = 'Verifying…'; err('');
+    let ok = false;
+    try {
+      const [uh, ph] = await Promise.all([kdf(u), kdf(p)]);
+      ok = teq(uh, U_HASH) & teq(ph, P_HASH);
+    } catch (x) { err('Verification failed. Try again.'); }
+    btn.disabled = false; btn.textContent = 'Sign in';
+    if (ok) {
+      del(LKEY);
+      const now = Date.now();
+      write(KEY, {iat: now, exp: now + TTL, id: [...crypto.getRandomValues(new Uint8Array(12))].map(b => b.toString(16).padStart(2, '0')).join('')});
+      return enter();
+    }
+    const l = read(LKEY) || {n: 0};
+    l.n = (l.n || 0) + 1;
+    if (l.n >= MAX_FAILS) { l.until = Date.now() + LOCK_MS; l.n = 0; err('Too many attempts. Locked for 5 minutes.'); }
+    else err('Invalid username or password. ' + (MAX_FAILS - l.n) + ' attempt(s) left.');
+    write(LKEY, l);
+    $g('#lg-pass').value = '';
+  }
+
+  function init() {
+    $g('#lg-form').addEventListener('submit', submit);
+    $g('#lg-eye').onclick = () => {
+      const i = $g('#lg-pass'), show = i.type === 'password';
+      i.type = show ? 'text' : 'password';
+      $g('#lg-eye').textContent = show ? 'Hide' : 'Show';
+    };
+    $g('#btn-logout').onclick = () => logout(false);
+    window.addEventListener('storage', e => { if (e.key === KEY && !e.newValue) location.reload(); });   // logout in another tab
+    document.addEventListener('visibilitychange', () => { if (!document.hidden && booted) tick(); });
+    try { const m = sessionStorage.getItem('qg_msg'); if (m) { err(m); sessionStorage.removeItem('qg_msg'); } } catch (e) {}
+    if (session()) enter(); else { del(KEY); $g('#lg-user').focus(); }
+  }
+  return {init, logout};
+})();
+Auth.init();
 </script>
 </body>
 </html>
